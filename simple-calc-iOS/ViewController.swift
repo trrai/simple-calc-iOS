@@ -8,14 +8,21 @@
 
 import UIKit
 
+var history = [String]();
+
 class ViewController: UIViewController {
 
     @IBOutlet weak var display: UILabel!
     var displayValue : Double = 0;
     var currentValue : Double = 0;
-    var nums = [Double]()
+    var nums = [Double]();
     var inOperation = false;
     var currentOp = "";
+    var currentCalcString = "";
+    
+    @IBAction func goToHistory(_ sender: Any) {
+        performSegue(withIdentifier: "segue", sender: self)
+    }
     
     @IBAction func num(_ sender: UIButton) {
         if(inOperation){
@@ -26,6 +33,8 @@ class ViewController: UIViewController {
             display.text = display.text! + sender.titleLabel!.text!;
             displayValue = Double(display.text!)!
         }
+        currentCalcString += " ";
+        currentCalcString += String(display!.text!);
     }
     
     @IBAction func clear(_ sender: UIButton) {
@@ -34,6 +43,7 @@ class ViewController: UIViewController {
         nums = [Double]();
         currentValue = 0;
         currentOp = "";
+        currentCalcString = "";
     }
     
     func calculate(){
@@ -57,6 +67,7 @@ class ViewController: UIViewController {
         default:
             return
         }
+        //currentCalcString += String(currentValue);
     }
     
     @IBAction func operation(_ sender: UIButton) {
@@ -73,12 +84,17 @@ class ViewController: UIViewController {
             display.text = String(currentValue).replacingOccurrences(of: ".0", with: "");
             nums = [Double]();
             currentOp = "";
-            
+            currentCalcString += " = ";
+            currentCalcString += display!.text!;
+            history.append(currentCalcString);
+            currentCalcString = "";
             //print("current value after equals: \(currentValue)" );
             //print("nums: \(nums)");
         case "+", "-", "x", "/", "%":
             //print("current value before: \(currentValue)");
             //print("nums: \(nums)");
+            currentCalcString += " ";
+            currentCalcString += operationType;
             currentOp = operationType;
             display.text = operationType;
             nums.append(displayValue);
@@ -86,13 +102,17 @@ class ViewController: UIViewController {
             //print("current value afterwards: \(currentValue)");
             //print("nums: \(nums)");
         case "Count", "Avg", "Fact":
+            currentCalcString += " ";
+            currentCalcString += operationType;
             currentOp = operationType;
             display.text = operationType;
             nums.append(displayValue);
         default:
             return
         }
+
         inOperation = true;
+    
     }
     
     override func viewDidLoad() {
